@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Big Amazon Style Store</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #e3e6e6;
+      color: #111;
+    }
+
+    /* Top header */
+    header {
+      background: #131921;
+      color: white;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .logo {
+      font-size: 22px;
+      font-weight: bold;
+      color: #ff9900;
+      white-space: nowrap;
+    }
+    .location {
+      font-size: 11px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    .location span {
+      font-size: 13px;
+      font-weight: bold;
+    }
+    .search-bar {
+      flex: 1;
+      display: flex;
+      max-width: 700px;
+    }
+    .search-bar select {
+      padding: 6px;
+      border: none;
+      background: #f3f3f3;
+      font-size: 13px;
+    }
+    .search-bar input {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+    }
+    .search-bar button {
+      padding: 8px 14px;
+      border: none;
+      background: #febd69;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .header-link {
+      font-size: 12px;
+      line-height: 1.2;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .header-link span {
+      font-size: 14px;
+      font-weight: bold;
+      display: block;
+    }
+    .cart {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .cart-count {
+      font-weight: bold;
+      margin: 0 4px;
+      color: #febd69;
+    }
+
+    /* Secondary nav */
+    .nav-bar {
+      background: #232f3e;
+      color: white;
+      padding: 8px 16px;
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+      align-items: center;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .nav-item {
+      cursor: pointer;
+    }
+    .nav-item:hover {
+      text-decoration: underline;
+    }
+
+    /* Layout */
+    main {
+      padding: 16px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Hero banner */
+    .hero {
+      background: url("https://via.placeholder.com/1400x350?text=Big+Hero+Banner") center/cover no-repeat;
+      height: 320px;
+      position: relative;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .hero-message {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(255,255,255,0.9);
+      padding: 10px 16px;
+      border-radius: 4px;
+      max-width: 400px;
+      font-size: 14px;
+    }
+    .hero-message a {
+      color: #007185;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    /* Main grid: sidebar + content */
+    .content-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 16px;
+    }
+
+    /* Sidebar filters */
+    .sidebar {
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      font-size: 13px;
+      max-height: 900px;
+      overflow-y: auto;
+    }
+    .sidebar h3 {
+      font-size: 15px;
+      margin-top: 0;
+    }
+    .filter-group {
+      margin-bottom: 16px;
+    }
+    .filter-group h4 {
+      margin: 6px 0;
+      font-size: 13px;
+    }
+    .filter-group label {
+      display: block;
+      margin: 2px 0;
+      cursor: pointer;
+    }
+
+    /* Product sections */
+    .sections {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .section {
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+    .section-header h2 {
+      font-size: 18px;
+      margin: 0;
+    }
+    .section-header a {
+      font-size: 12px;
+      color: #007185;
+      text-decoration: none;
+    }
+
+    /* Product grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .product-card {
+      background: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 260px;
+    }
+    .product-image {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .product-image img {
+      max-width: 100%;
+      max-height: 150px;
+      object-fit: contain;
+    }
+    .product-title {
+      font-size: 14px;
+      font-weight: bold;
+      margin: 4px 0;
+    }
+    .product-meta {
+      font-size: 12px;
+      color: #555;
+      margin: 2px 0;
+    }
+    .product-price {
+      font-size: 16px;
+      color: #b12704;
+      font-weight: bold;
+      margin: 4px 0;
+    }
+    .product-rating {
+      font-size: 12px;
+      color: #f0c14b;
+      margin: 2px 0;
+    }
+    .product-actions {
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .product-actions button {
+      padding: 6px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .btn-add {
+      background: #ffd814;
+    }
+    .btn-buy {
+      background: #ffa41c;
+    }
+
+    /* Cart side panel */
+    #cartPanel {
+      position: fixed;
+      top: 0;
+      right: -380px;
+      width: 340px;
+      height: 100%;
+      background: #ffffff;
+      box-shadow: -2px 0 6px rgba(0,0,0,0.3);
+      padding: 14px;
+      transition: right 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      z-index: 2000;
+    }
+    #cartPanel.open {
+      right: 0;
+    }
+    #cartPanel h3 {
+      margin-top: 0;
+      margin-bottom: 8px;
+    }
+    #cartItems {
+      flex: 1;
+      overflow-y: auto;
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+      padding: 6px 0;
+      font-size: 13px;
+    }
+    .cart-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 4px;
+      padding: 4px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .cart-item-title {
+      font-weight: bold;
+    }
+    .cart-item-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      justify-content: flex-end;
+    }
+    .cart-item-controls button {
+      padding: 2px 6px;
+      font-size: 12px;
+      border: 1px solid #ccc;
+      background: #f3f3f3;
+      cursor: pointer;
+    }
+    #cartSummary {
+      margin-top: 8px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    #checkoutBtn {
+      margin-top: 10px;
+      padding: 8px;
+      background: #ffa41c;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      font-size: 14px;
+      border-radius: 3px;
+    }
+    #closeCartBtn {
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 14px;
+      color: #007185;
+      padding: 0;
+      align-self: flex-end;
+      margin-bottom: 4px;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 30px;
+      background: #232f3e;
+      color: #ddd;
+      padding-top: 20px;
+      font-size: 13px;
+    }
+    .back-to-top {
+      background: #37475a;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .back-to-top:hover {
+      background: #485769;
+    }
+    .footer-columns {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .footer-column h4 {
+      margin-top: 0;
+      color: #fff;
+    }
+    .footer-column a {
+      display: block;
+      color: #ddd;
+      text-decoration: none;
+      margin: 2px 0;
+    }
+    .footer-bottom {
+      text-align: center;
+      padding: 10px;
+      border-top: 1px solid #3a4553;
+      font-size: 12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .content-layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        order: 2;
+      }
+      .sections {
+        order: 1;
+      }
+    }
+    @media (max-width: 700px) {
+      header {
+        flex-wrap: wrap;
+      }
+      .location {
+        display: none;
+      }
+      .search-bar {
+        order: 3;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header>
+    <div class="logo">Mega Amazon Clone</div>
+    <div class="location">
+      Deliver to<br />
+      <span>Bothell 98011</span>
+    </div>
+    <div class="search-bar">
+      <select id="searchCategory">
+        <option value="all">All</option>
+        <option value="electronics">Electronics</option>
+        <option value="gaming">Gaming</option>
+        <option value="books">Books</option>
+        <option value="home">Home</option>
+      </select>
+      <input type="text" id="searchInput" placeholder="Search Mega Amazon Clone..." />
+      <button onclick="searchProducts()">Search</button>
+    </div>
+    <div class="header-link">
+      Hello, Satvik<br />
+      <span>Account & Lists ▾</span>
+    </div>
+    <div class="header-link">
+      Returns<br />
+      <span>& Orders</span>
+    </div>
+    <div class="cart" onclick="toggleCart()">
+      🛒 Cart <span class="cart-count" id="cartCount">0</span>
+    </div>
+  </header>
+
+  <!-- NAV BAR -->
+  <div class="nav-bar">
+    <div class="nav-item">☰ All</div>
+    <div class="nav-item" onclick="filterByNav('deals')">Today's Deals</div>
+    <div class="nav-item" onclick="filterByNav('electronics')">Electronics</div>
+    <div class="nav-item" onclick="filterByNav('gaming')">Gaming</div>
+    <div class="nav-item" onclick="filterByNav('books')">Books</div>
+    <div class="nav-item" onclick="filterByNav('home')">Home & Kitchen</div>
+    <div class="nav-item" onclick="filterByNav('bestseller')">Best Sellers</div>
+    <div class="nav-item" onclick="filterByNav('recommended')">Recommended</div>
+  </div>
+
+  <!-- HERO -->
+  <main>
+    <div class="hero">
+      <div class="hero-message">
+        <strong>Welcome to Mega Amazon Clone.</strong><br />
+        Shop gaming gear, electronics, books, and more—built in pure HTML, CSS, and JavaScript.<br />
+        <a href="#dealsSection">Shop today's deals</a>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT LAYOUT -->
+    <div class="content-layout">
+      <!-- SIDEBAR FILTERS -->
+      <aside class="sidebar">
+        <h3>Filters</h3>
+
+        <div class="filter-group">
+          <h4>Category</h4>
+          <label><input type="radio" name="categoryFilter" value="all" checked onchange="applyFilters()" /> All</label>
+          <label><input type="radio" name="categoryFilter" value="electronics" onchange="applyFilters()" /> Electronics</label>
+          <label><input type="radio" name="categoryFilter" value="gaming" onchange="applyFilters()" /> Gaming</label>
+          <label><input type="radio" name="categoryFilter" value="books" onchange="applyFilters()" /> Books</label>
+          <label><input type="radio" name="categoryFilter" value="home" onchange="applyFilters()" /> Home & Kitchen</label>
+        </div>
+
+        <div class="filter-group">
+          <h4>Price</h4>
+          <label><input type="radio" name="priceFilter" value="all" checked onchange="applyFilters()" /> Any</label>
+          <label><input type="radio" name="priceFilter" value="0-25" onchange="applyFilters()" /> Under $25</label>
+          <label><input type="radio" name="priceFilter" value="25-100" onchange="applyFilters()" /> $25 to $100</label>
+          <label><input type="radio" name="priceFilter" value="100-300" onchange="applyFilters()" /> $100 to $300</label>
+          <label><input type="radio" name="priceFilter" value="300-9999" onchange="applyFilters()" /> $300 & above</label>
+        </div>
+
+        <div class="filter-group">
+          <h4>Rating</h4>
+          <label><input type="radio" name="ratingFilter" value="all" checked onchange="applyFilters()" /> Any</label>
+          <label><input type="radio" name="ratingFilter" value="4" onchange="applyFilters()" /> 4★ & up</label>
+          <label><input type="radio" name="ratingFilter" value="3" onchange="applyFilters()" /> 3★ & up</label>
+        </div>
+
+        <div class="filter-group">
+          <h4>Tags</h4>
+          <label><input type="checkbox" value="deal" onchange="applyFilters()" /> Deal</label>
+          <label><input type="checkbox" value="bestseller" onchange="applyFilters()" /> Best Seller</label>
+          <label><input type="checkbox" value="recommended" onchange="applyFilters()" /> Recommended</label>
+        </div>
+      </aside>
+
+      <!-- SECTIONS -->
+      <div class="sections">
+        <!-- Deals -->
+        <section class="section" id="dealsSection">
+          <div class="section-header">
+            <h2>Today's Deals</h2>
+            <a href="javascript:void(0)" onclick="filterByNav('deals')">See more deals</a>
+          </div>
+          <div class="product-grid" id="dealsGrid"></div>
+        </section>
+
+        <!-- Best Sellers -->
+        <section class="section" id="bestSellersSection">
+          <div class="section-header">
+            <h2>Best Sellers</h2>
+            <a href="javascript:void(0)" onclick="filterByNav('bestseller')">Browse all best sellers</a>
+          </div>
+          <div class="product-grid" id="bestSellersGrid"></div>
+        </section>
+
+        <!-- Recommended -->
+        <section class="section" id="recommendedSection">
+          <div class="section-header">
+            <h2>Recommended for You</h2>
+            <a href="javascript:void(0)" onclick="filterByNav('recommended')">Refresh recommendations</a>
+          </div>
+          <div class="product-grid" id="recommendedGrid"></div>
+        </section>
+
+        <!-- All products (filtered) -->
+        <section class="section" id="allProductsSection">
+          <div class="section-header">
+            <h2>All Products</h2>
+            <a href="javascript:void(0)" onclick="resetFilters()">Clear filters</a>
+          </div>
+          <div class="product-grid" id="allProductsGrid"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- CART PANEL -->
+  <div id="cartPanel">
+    <button id="closeCartBtn" onclick="toggleCart()">Close ✕</button>
+    <h3>Your Cart</h3>
+    <div id="cartItems"></div>
+    <div id="cartSummary">Subtotal (0 items): $0.00</div>
+    <button id="checkoutBtn" onclick="checkout()">Proceed to checkout</button>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="back-to-top" onclick="scrollToTop()">Back to top</div>
+    <div class="footer-columns">
+      <div class="footer-column">
+        <h4>Get to Know Us</h4>
+        <a href="#">Careers</a>
+        <a href="#">Blog</a>
+        <a href="#">About Mega Amazon Clone</a>
+        <a href="#">Investor Relations</a>
+      </div>
+      <div class="footer-column">
+        <h4>Make Money with Us</h4>
+        <a href="#">Sell products</a>
+        <a href="#">Become an Affiliate</a>
+        <a href="#">Advertise Your Products</a>
+      </div>
+      <div class="footer-column">
+        <h4>Payment Products</h4>
+        <a href="#">Credit Cards</a>
+        <a href="#">Gift Cards</a>
+        <a href="#">Reload Balance</a>
+      </div>
+      <div class="footer-column">
+        <h4>Let Us Help You</h4>
+        <a href="#">Your Account</a>
+        <a href="#">Shipping Rates & Policies</a>
+        <a href="#">Returns & Replacements</a>
+        <a href="#">Help</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      Mega Amazon Clone · Built in HTML, CSS & JS · Not a real store
+    </div>
+  </footer>
+
+  <script>
+    // BIG PRODUCT DATA
+    const products = [
+      // Gaming
+      { id: 1, name: "Pro RGB Gaming Mouse", category: "gaming", price: 39.99, rating: 4.5, reviews: 1243, tags: ["deal", "bestseller"], img: "https://via.placeholder.com/200x150?text=Gaming+Mouse", desc: "High DPI, customizable RGB, 8 buttons." },
+      { id: 2, name: "Mechanical Gaming Keyboard", category: "gaming", price: 89.99, rating: 4.7, reviews: 987, tags: ["bestseller"], img: "https://via.placeholder.com/200x150?text=Keyboard", desc: "Blue switches, per-key RGB, metal frame." },
+      { id: 3, name: "7.1 Surround Gaming Headset", category: "gaming", price: 59.99, rating: 4.3, reviews: 654, tags: ["deal", "recommended"], img: "https://via.placeholder.com/200x150?text=Headset", desc: "Noise-cancelling mic, comfy ear cups." },
+      { id: 4, name: "XL Gaming Mouse Pad", category: "gaming", price: 19.99, rating: 4.6, reviews: 321, tags: ["deal"], img: "https://via.placeholder.com/200x150?text=Mouse+Pad", desc: "Extended size, stitched edges, non-slip." },
+
+      // Electronics
+      { id: 5, name: "27\" 4K UHD Monitor", category: "electronics", price: 329.99, rating: 4.4, reviews: 842, tags: ["bestseller"], img: "https://via.placeholder.com/200x150?text=4K+Monitor", desc: "IPS panel, 60Hz, HDR support." },
+      { id: 6, name: "USB-C Hub 8-in-1", category: "electronics", price: 34.99, rating: 4.2, reviews: 512, tags: ["deal", "recommended"], img: "https://via.placeholder.com/200x150?text=USB-C+Hub", desc: "HDMI, USB 3.0, SD, PD charging." },
+      { id: 7, name: "Noise Cancelling Earbuds", category: "electronics", price: 129.99, rating: 4.1, reviews: 1103, tags: ["recommended"], img: "https://via.placeholder.com/200x150?text=Earbuds", desc: "Wireless, long battery life, fast charge." },
+      { id: 8, name: "Portable Bluetooth Speaker", category: "electronics", price: 49.99, rating: 4.5, reviews: 2045, tags: ["deal", "bestseller"], img: "https://via.placeholder.com/200x150?text=Speaker", desc: "Water-resistant, deep bass, 12h playtime." },
+
+      // Books
+      { id: 9, name: "Learn JavaScript the Fun Way", category: "books", price: 24.99, rating: 4.8, reviews: 432, tags: ["bestseller", "recommended"], img: "https://via.placeholder.com/200x150?text=JS+Book", desc: "Hands-on projects, beginner friendly." },
+      { id: 10, name: "Algorithms Illustrated", category: "books", price: 39.99, rating: 4.6, reviews: 298, tags: ["recommended"], img: "https://via.placeholder.com/200x150?text=Algorithms", desc: "Visual explanations of core algorithms." },
+      { id: 11, name: "Designing Web Interfaces", category: "books", price: 29.99, rating: 4.3, reviews: 189, tags: [], img: "https://via.placeholder.com/200x150?text=UI+Design", desc: "Patterns and best practices for UI." },
+      { id: 12, name: "Game Development with JavaScript", category: "books", price: 34.99, rating: 4.4, reviews: 256, tags: ["deal"], img: "https://via.placeholder.com/200x150?text=Game+Dev", desc: "Build browser games step by step." },
+
+      // Home & Kitchen
+      { id: 13, name: "Ergonomic Office Chair", category: "home", price: 199.99, rating: 4.2, reviews: 743, tags: ["recommended"], img: "https://via.placeholder.com/200x150?text=Office+Chair", desc: "Lumbar support, adjustable height, mesh back." },
+      { id: 14, name: "LED Desk Lamp", category: "home", price: 29.99, rating: 4.5, reviews: 654, tags: ["deal"], img: "https://via.placeholder.com/200x150?text=Desk+Lamp", desc: "Dimmable, USB charging port, eye-care." },
+      { id: 15, name: "Mechanical Kitchen Scale", category: "home", price: 19.99, rating: 4.0, reviews: 210, tags: [], img: "https://via.placeholder.com/200x150?text=Kitchen+Scale", desc: "Accurate, compact, easy to clean." },
+      { id: 16, name: "Non-stick Frying Pan Set", category: "home", price: 59.99, rating: 4.3, reviews: 389, tags: ["deal", "bestseller"], img: "https://via.placeholder.com/200x150?text=Frying+Pan", desc: "3-piece set, oven safe, PFOA-free." }
+    ];
+
+    let cart = [];
+    let currentFiltered = [...products];
+
+    function renderSection(gridId, filterFn) {
+      const grid = document.getElementById(gridId);
+      grid.innerHTML = "";
+      const list = products.filter(filterFn);
+      list.forEach(p => grid.appendChild(createProductCard(p)));
+    }
+
+    function createProductCard(p) {
+      const card = document.createElement("div");
+      card.className = "product-card";
+      card.innerHTML = `
+        <div>
+          <div class="product-image">
+            <img src="${p.img}" alt="${p.name}">
+          </div>
+          <div class="product-title">${p.name}</div>
+          <div class="product-meta">${p.desc}</div>
+          <div class="product-price">$${p.price.toFixed(2)}</div>
+          <div class="product-rating">${"★".repeat(Math.round(p.rating))} (${p.reviews} reviews)</div>
+        </div>
+        <div class="product-actions">
+          <button class="btn-add" onclick="addToCart(${p.id})">Add to Cart</button>
+          <button class="btn-buy" onclick="buyNow(${p.id})">Buy Now</button>
+        </div>
+      `;
+      return card;
+    }
+
+    function renderAllProducts(list = currentFiltered) {
+      const grid = document.getElementById("allProductsGrid");
+      grid.innerHTML = "";
+      list.forEach(p => grid.appendChild(createProductCard(p)));
+    }
+
+    function addToCart(id) {
+      const existing = cart.find(item => item.id === id);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        const product = products.find(p => p.id === id);
+        cart.push({ ...product, qty: 1 });
+      }
+      updateCartUI();
+    }
+
+    function buyNow(id) {
+      addToCart(id);
+      toggleCart(true);
+    }
+
+    function changeQty(id, delta) {
+      const item = cart.find(i => i.id === id);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) {
+        cart = cart.filter(i => i.id !== id);
+      }
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
+      document.getElementById("cartCount").textContent = cartCount;
+
+      const cartItemsDiv = document.getElementById("cartItems");
+      cartItemsDiv.innerHTML = "";
+      let total = 0;
+      cart.forEach(item => {
+        total += item.price * item.qty;
+        const div = document.createElement("div");
+        div.className = "cart-item";
+        div.innerHTML = `
+          <div>
+            <div class="cart-item-title">${item.name}</div>
+            <div>$${item.price.toFixed(2)} x ${item.qty}</div>
+          </div>
+          <div class="cart-item-controls">
+            <button onclick="changeQty(${item.id}, -1)">-</button>
+            <span>${item.qty}</span>
+            <button onclick="changeQty(${item.id}, 1)">+</button>
+          </div>
+        `;
+        cartItemsDiv.appendChild(div);
+      });
+      document.getElementById("cartSummary").textContent =
+        "Subtotal (" + cartCount + " items): $" + total.toFixed(2);
+    }
+
+    function toggleCart(forceOpen) {
+      const panel = document.getElementById("cartPanel");
+      if (forceOpen === true) {
+        panel.classList.add("open");
+      } else if (forceOpen === false) {
+        panel.classList.remove("open");
+      } else {
+        panel.classList.toggle("open");
+      }
+    }
+
+    function checkout() {
+      if (cart.length === 0) {
+        alert("Your cart is empty.");
+        return;
+      }
+      alert("Fake checkout complete! Thanks for testing your mega store.");
+      cart = [];
+      updateCartUI();
+      toggleCart(false);
+    }
+
+    function getSelectedRadio(name) {
+      const radios = document.querySelectorAll("input[name='" + name + "']");
+      for (const r of radios) {
+        if (r.checked) return r.value;
+      }
+      return "all";
+    }
+
+    function getCheckedTags() {
+      const checks = document.querySelectorAll(".filter-group input[type='checkbox']");
+      const tags = [];
+      checks.forEach(c => {
+        if (c.checked) tags.push(c.value);
+      });
+      return tags;
+    }
+
+    function applyFilters() {
+      const category = getSelectedRadio("categoryFilter");
+      const price = getSelectedRadio("priceFilter");
+      const rating = getSelectedRadio("ratingFilter");
+      const tags = getCheckedTags();
+
+      let [minPrice, maxPrice] = [0, Infinity];
+      if (price !== "all") {
+        const parts = price.split("-");
+        minPrice = parseFloat(parts[0]);
+        maxPrice = parseFloat(parts[1]);
+      }
+
+      currentFiltered = products.filter(p => {
+        if (category !== "all" && p.category !== category) return false;
+        if (p.price < minPrice || p.price > maxPrice) return false;
+        if (rating !== "all" && p.rating < parseFloat(rating)) return false;
+        if (tags.length > 0 && !tags.some(t => p.tags.includes(t))) return false;
+        return true;
+      });
+
+      renderAllProducts();
+    }
+
+    function resetFilters() {
+      document.querySelector("input[name='categoryFilter'][value='all']").checked = true;
+      document.querySelector("input[name='priceFilter'][value='all']").checked = true;
+      document.querySelector("input[name='ratingFilter'][value='all']").checked = true;
+      document.querySelectorAll(".filter-group input[type='checkbox']").forEach(c => (c.checked = false));
+      currentFiltered = [...products];
+      renderAllProducts();
+    }
+
+    function searchProducts() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      const cat = document.getElementById("searchCategory").value;
+      const list = products.filter(p => {
+        if (cat !== "all" && p.category !== cat) return false;
+        return (
+          p.name.toLowerCase().includes(query) ||
+          p.desc.toLowerCase().includes(query)
+        );
+      });
+      currentFiltered = list;
+      renderAllProducts();
+      document.getElementById("allProductsSection").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function filterByNav(tagOrCategory) {
+      if (["deals", "bestseller", "recommended"].includes(tagOrCategory)) {
+        currentFiltered = products.filter(p => p.tags.includes(tagOrCategory));
+      } else {
+        currentFiltered = products.filter(p => p.category === tagOrCategory);
+      }
+      renderAllProducts();
+      document.getElementById("allProductsSection").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // INITIAL RENDER
+    renderSection("dealsGrid", p => p.tags.includes("deal"));
+    renderSection("bestSellersGrid", p => p.tags.includes("bestseller"));
+    renderSection("recommendedGrid", p => p.tags.includes("recommended"));
+    renderAllProducts();
+  </script>
+</body>
+</html>
