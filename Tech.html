@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pac-Man Medium Ghost Speed</title>
+<style>
+  body {
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    color: #fff;
+    font-family: Arial, sans-serif;
+  }
+  #gameCanvas {
+    border: 2px solid #fff;
+    background: #000;
+  }
+  #info {
+    text-align: center;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<div>
+  <canvas id="gameCanvas" width="448" height="448"></canvas>
+  <div id="info">
+    <p>Use arrow keys to move Pac-Man</p>
+    <p>Score: <span id="score">0</span></p>
+    <p id="status"></p>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const scoreEl = document.getElementById("score");
+const statusEl = document.getElementById("status");
+
+const tileSize = 32;
+const rows = 14;
+const cols = 14;
+
+// 0 empty, 1 wall, 2 dot
+const map = [
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,2,2,2,2,2,2,1,2,2,2,2,2,1],
+  [1,2,1,1,1,2,2,1,2,2,1,1,2,1],
+  [1,2,2,2,1,2,2,2,2,2,1,2,2,1],
+  [1,2,1,2,1,2,1,1,1,2,1,2,1,1],
+  [1,2,1,2,2,2,2,2,1,2,2,2,2,1],
+  [1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+  [1,2,2,2,2,2,2,2,2,2,2,2,2,1],
+  [1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+  [1,2,2,2,2,2,2,2,2,2,2,2,2,1],
+  [1,2,1,1,1,1,1,1,1,1,1,1,2,1],
+  [1,2,2,2,2,2,2,2,2,2,2,2,2,1],
+  [1,2,2,2,2,2,2,2,2,2,2,2,2,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+];
+
+let pacman = { x: 1, y: 1, dirX: 0, dirY: 0 };
+let score = 0;
+let gameOver = false;
+
+// Ghosts
+let ghosts = [
+  { x: 12, y: 12, color: "red" },
+  { x: 12, y: 1, color: "pink" },
+  { x: 1, y: 12, color: "cyan" }
+];
+
+// MEDIUM SPEED GHOSTS
+let ghostTimer = 0;
+let ghostSpeed = 12; // Medium speed
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowUp") pacman.dirX = 0, pacman.dirY = -1;
+  if (e.key === "ArrowDown") pacman.dirX = 0, pacman.dirY = 1;
+  if (e.key === "ArrowLeft") pacman.dirX = -1, pacman.dirY = 0;
+  if (e.key === "ArrowRight") pacman.dirX = 1, pacman.dirY = 0;
+});
+
+function canMove(x, y) {
+  return map[y] && map[y][x] !== 1;
+}
+
+function moveGhosts() {
+  ghostTimer++;
+  if (ghostTimer < ghostSpeed) return;
+  ghostTimer = 0;
+
+  ghosts.forEach(g => {
+    let dirs = [
+      {x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}
+    ];
+    let d = dirs[Math.floor(Math.random()*4)];
+    let nx = g.x + d.x;
+    let ny = g.y + d.y;
+    if (canMove(nx, ny)) {
+      g.x = nx;
+      g.y = ny;
+    }
+  });
+}
+
+function checkCollision() {
+  for (let g of ghosts) {
+    if (g.x === pacman.x && g.y === pacman.y) {
+      gameOver = true;
+      statusEl.textContent = "GAME OVER";
+    }
+  }
+}
+
+function update() {
+  if (gameOver) return;
+
+  let nx = pacman.x + pacman.dirX;
+  let ny = pacman.y + pacman.dirY;
+
+  if (canMove(nx, ny)) {
+    pacman.x = nx;
+    pacman.y = ny;
+
+    if (map[ny][nx] === 2) {
+      map[ny][nx] = 0;
+      score += 10;
+      scoreEl.textContent = score;
+    }
+  }
+
+  moveGhosts();
+  checkCollision();
+  draw();
+  requestAnimationFrame(update);
+}
+
+function drawMap() {
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      ctx.fillStyle = map[y][x] === 1 ? "#0011aa" : "#000";
+      ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+
+      if (map[y][x] === 2) {
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(x*tileSize+16, y*tileSize+16, 4, 0, Math.PI*2);
+        ctx.fill();
+      }
+    }
+  }
+}
+
+function drawPacman() {
+  ctx.fillStyle = "yellow";
+  ctx.beginPath();
+  ctx.arc(pacman.x*tileSize+16, pacman.y*tileSize+16, 14, 0.25*Math.PI, 1.75*Math.PI);
+  ctx.lineTo(pacman.x*tileSize+16, pacman.y*tileSize+16);
+  ctx.fill();
+}
+
+function drawGhosts() {
+  ghosts.forEach(g => {
+    ctx.fillStyle = g.color;
+    ctx.beginPath();
+    ctx.arc(g.x*tileSize+16, g.y*tileSize+16, 14, 0, Math.PI*2);
+    ctx.fill();
+  });
+}
+
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawMap();
+  drawPacman();
+  drawGhosts();
+}
+
+draw();
+update();
+</script>
+
+</body>
+</html>
